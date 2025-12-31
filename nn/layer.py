@@ -10,10 +10,7 @@ class Layer():
     """
 
     def __init__(self: "Layer") -> None:
-        self._input:  np.array | None      = None
-        self._output: np.array | None      = None
         self._size: tuple[int, int] | None = None # Size of the input and output array as a tuple.
-        self._learningRate: float | None   = None # The change of which to change the inner workings of this layer.
 
     def Forward(self, inputs: np.array) -> np.array:
         """
