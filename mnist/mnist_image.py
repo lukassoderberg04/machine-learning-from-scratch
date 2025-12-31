@@ -1,6 +1,6 @@
 import numpy
 
-class MnistImage:
+class MnistImage():
     """
         An image that reflects the data in the mnist dataset.
     """

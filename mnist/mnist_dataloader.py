@@ -5,7 +5,7 @@ from pathlib import Path
 from mnist.mnist_image import MnistImage
 import csv
 
-class MnistDataloader:
+class MnistDataloader():
     """
         Loads data from the mnist dataset.
     """
@@ -16,10 +16,10 @@ class MnistDataloader:
 
     def __init__(self, pathToDataset: str, batchSize: int = 10) -> None:
         """
-            :param pathToDataset: Description
+            :param pathToDataset: The path to the dataset (nmist).
             :type pathToDataset: str
 
-            :param batchSize: Description
+            :param batchSize: The amount of images to read each read.
             :type batchSize: int
 
             :raises TypeError: If the batchSize is negative or zero.
