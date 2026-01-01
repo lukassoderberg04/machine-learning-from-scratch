@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from layer import Layer
+from nn.layer import Layer
 
 class Network():
     """
@@ -17,7 +17,7 @@ class Network():
         if self._layers is None:
             raise RuntimeError("Layers of a neural network has not been initialized yet!")
         
-        if len(self._layers <= 0):
+        if len(self._layers) <= 0:
             raise RuntimeError("A network can't have 0 layers!")
         
         for (index, layer) in enumerate(self._layers[:-1]):
@@ -27,4 +27,4 @@ class Network():
             next_layer_input_size: int = next_layer.GetSize()[0]
 
             if layer_output_size != next_layer_input_size:
-                raise RuntimeError(f"Layers don't fully connect! Between layer: {index} and {index + 1}!")
+                raise RuntimeError(f"Layers don't fully connect! Between layers: {index} and {index + 1}!")

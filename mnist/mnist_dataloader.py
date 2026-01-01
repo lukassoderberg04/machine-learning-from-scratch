@@ -37,7 +37,7 @@ class MnistDataloader():
 
         self._csvFile = csv.reader(self._file)
 
-        if (batchSize > 1):
+        if (batchSize >= 1):
             self._batchSize: int = batchSize
         else:
             raise TypeError("Batch size can't be lower than 1!")
@@ -105,4 +105,5 @@ class MnistDataloader():
             return None
         
     def __del__(self):
-        self._file.close()
+        if hasattr(self, "_file") and self._file:
+            self._file.close()

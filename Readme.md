@@ -3,6 +3,15 @@ A personal project made to learn more about how machine learning is implemented 
 
 ## Running the project
 
+### Prerequisites
+
+### Executing tests
+By using pythons built in testing module, you can run all tests from the root directory of this project.
+Do this by typing this into the command line with the working directory set to the project root:
+```bash
+python -m unittest
+```
+
 ## Project structure
 * **/mnist/**: Directory containing helper classes and utility functions for loading the mnist dataset, used in training and validating the different models.
 
