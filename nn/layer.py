@@ -41,3 +41,9 @@ class Layer():
             raise RuntimeError("Size has not been initialized by a layer!")
         
         return self._size
+    
+    def GetInputSize(self) -> int:
+        return self.GetSize()[0]
+    
+    def GetOutputSize(self) -> int:
+        return self.GetSize()[1]
