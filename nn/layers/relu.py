@@ -10,6 +10,11 @@ class Relu(Layer):
     """
 
     def __init__(self: "Relu", inputs: int):
+        """
+            :param inputs: The amount of inputs.
+            :type inputs: int
+        """
+
         self._size: tuple[int, int] = (inputs, inputs) # The same size since it just applies a function on the input.
 
         # Initialized to None since no forward pass has happened.

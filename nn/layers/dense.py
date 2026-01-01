@@ -15,6 +15,17 @@ class Dense(Layer):
             output: int, 
             useBias: bool = True
         ):
+        """
+            :param input: The amount of inputs.
+            :type input: int
+
+            :param output: The amount of outputs.
+            :type output: int
+
+            :param useBias: Tells if you want to use bias when calculating the output.
+            :type useBias: bool
+        """
+
         self._size: tuple[int, int] = (input, output)
 
         # Initialized to None since no forward pass has happened.
