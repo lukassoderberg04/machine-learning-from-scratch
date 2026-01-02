@@ -23,7 +23,7 @@ class App():
         """
 
         CELL_SIZE: int = 40 # Size in pixels of the cells.
-        GRID_SIZE: int = 8  # Size of the grid (x * x).
+        GRID_SIZE: int = 28 # Size of the grid (x * x).
 
         root: tk.Tk = tk.Tk() # Creates a widget.
         root.title("Machine Learning Digits")
