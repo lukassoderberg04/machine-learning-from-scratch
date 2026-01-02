@@ -61,4 +61,41 @@ class Softmax(Layer):
         return self._outputs
     
     def Backward(self, derivatives: np.array) -> np.array:
-        pass
+        """
+            First of, this layer isn't that effective since it has to calculate the jacobian matrix
+            containing all the different gradients since changing input x0 changes all the outputs,
+            hence causing the cost to change. To make it more efficient, make sure to use softmax
+            together with cross entropy to make the backpropogation algorithm faster.
+
+            One intuition I gathered from doing this work about the jacobian and it's effect was thinking
+            of another example where a vector in the input of a function (more than one variable). Ex:
+            ShouldIGoOutToday(RainingPercentage, WindSpeed, Temperature). Now, the jacobian could tell us
+            how much wind speed and temperature affect my decision to go out by making RainingPercentage static.
+            Hence, ShouldIGoOutToday(0, WindSpeed, Temperature). The jacobian gives you all the gradients for
+            the vectorized function (maybe need a better explanation, sry). The jacobian gives you answers
+            on how some input changes the output directly or indirectly.
+
+            Now for this function, I derived the jacobian by calculating the derivative of the softmax function
+            in certain conditions. For the diagonal, it became (-1) * Si * Sj when i = j, where Si is the output node i which
+            was computed by S(input I, rest Of Inputs) where input I was the target. The off-diagonal became Si * (1 - Sj) when i != j.
+            Now having the jacobian, we want to understand how much input node I changes the cost. Since Input I changes all output nodes, it's
+            indirect effect on the cost function has to be included, which means that for input i, we can't just look at the derivative dsi/dxi,
+            we also need to look at dsj/dxi, dsy/dxi and so on. Hence we add up the total effect that the variable xi, or input i, has on the cost.
+            So we are going to, for each input, multiply every gradient with the corresponding output derivative like this: dSi/dxj * dC/dSi, and then
+            summing them all up.
+
+            :param derivatives: The incoming derivatives from the layer in front.
+            :type derivatives: numpy.array
+
+            :return: Returns the propogation derivative for use in the layers in the back.
+            :rtype: numpy.array
+        """
+        # Convert the outputs to a column vector.
+        outputAsColumn: np.array = self._outputs[:, None]
+
+        # Faster way to calculate the jacobian.
+        jacobian: np.ndarray = np.diagflat(self._outputs) - outputAsColumn @ np.transpose(outputAsColumn)
+
+        toProp: np.array = jacobian @ derivatives
+
+        return toProp
