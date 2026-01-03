@@ -18,10 +18,10 @@ class Relu(Layer):
         self._size: tuple[int, int] = (inputs, inputs) # The same size since it just applies a function on the input.
 
         # Initialized to None since no forward pass has happened.
-        self._inputs: np.array | None  = None
-        self._outputs: np.array | None = None
+        self._inputs: np.ndarray | None  = None
+        self._outputs: np.ndarray | None = None
 
-    def Forward(self, inputs: np.array) -> np.array:
+    def Forward(self, inputs: np.ndarray) -> np.ndarray:
         """
             The forward of the ReLU function is just a max(0, input), since it's a y(x) = x function when
             x > 0 and else 0.
@@ -36,7 +36,7 @@ class Relu(Layer):
 
         return self._outputs
     
-    def Backward(self, derivatives: np.array) -> np.array:
+    def Backward(self, derivatives: np.ndarray) -> np.ndarray:
         """
             The backward pass on the ReLU function calculates the dactivation / dinput. And since
             the activation function looks like this: activation(input) = input, when input > 0, the
@@ -50,6 +50,6 @@ class Relu(Layer):
         
         # Since we need to propogate the derivative in relation to the input (since the input is calculated in the layers before),
         # we multiply the derivatives where the input is <= 0 with 0 and else 1. This is done due to the chain rule.
-        toPropagate: np.array = derivatives * (self._inputs > 0)
+        toPropagate: np.ndarray = derivatives * (self._inputs > 0)
         
         return toPropagate

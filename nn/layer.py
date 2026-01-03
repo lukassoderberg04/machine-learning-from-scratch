@@ -12,27 +12,27 @@ class Layer():
     def __init__(self: "Layer") -> None:
         self._size: tuple[int, int] | None = None # Size of the input and output array as a tuple.
 
-    def Forward(self, inputs: np.array) -> np.array:
+    def Forward(self, inputs: np.ndarray) -> np.ndarray:
         """
             Computes the output based on inputs.
 
             :param inputs: Input neurons for this layer.
-            :type inputs: numpy.array
+            :type inputs: numpy.ndarray
 
             :return: The computed output.
-            :rtype: numpy.array
+            :rtype: numpy.ndarray
         """
         raise NotImplementedError("Forward has not been implemented by the class yet!")
 
-    def Backward(self, derivatives: np.array) -> np.array:
+    def Backward(self, derivatives: np.ndarray) -> np.ndarray:
         """
             Computes the local derivative and pushes the derivative back in the chain.
 
             :param derivatives: The computed derivatives from the layer in front.
-            :type derivatives: numpy.array
+            :type derivatives: numpy.ndarray
 
             :return: The computed last derivative which is to be used by the layer behind this. 
-            :rtype: numpy.array
+            :rtype: numpy.ndarray
         """
         raise NotImplementedError("Backward has not been implemented by the class yet!")
     

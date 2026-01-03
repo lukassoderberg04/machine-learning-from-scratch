@@ -29,28 +29,28 @@ class Dense(Layer):
         self._size: tuple[int, int] = (input, output)
 
         # Initialized to None since no forward pass has happened.
-        self._inputs: np.array | None  = None
-        self._outputs: np.array | None = None
+        self._inputs: np.ndarray | None  = None
+        self._outputs: np.ndarray | None = None
 
         # Initialize the bias, if bias are to be used!
         self._usesBias: bool        = useBias
-        self._bias: np.array | None = None
+        self._bias: np.ndarray | None = None
         if useBias:
             self._bias = np.zeros(shape=output)
 
         # Initialize the weights close to 0!
         self._weights: np.ndarray = np.random.normal(loc=0, scale=0.01, size=(output, input))
 
-    def Forward(self, inputs: np.array) -> np.array:
+    def Forward(self, inputs: np.ndarray) -> np.ndarray:
         """
             For each output, calculate the inputs scaled by the weight summed up together,
             hence this formula: listOfInputs[] * listOfWeightsIntoOutput[] + bias.
 
             :param inputs: The incoming inputs. Has to be the correct size as defined in the constructor.
-            :type inputs: numpy.array
+            :type inputs: numpy.ndarray
 
             :return: The output, calculated by the formula explained above.
-            :rtype: numpy.array
+            :rtype: numpy.ndarray
         """
         if len(inputs) != self.GetInputSize():
             raise RuntimeError("The input size was not as defined by the layer when forwarding!")
@@ -67,17 +67,17 @@ class Dense(Layer):
         
         return self._outputs
     
-    def Backward(self, derivatives: np.array) -> np.array:
+    def Backward(self, derivatives: np.ndarray) -> np.ndarray:
         """
             Recieves derivatives from the front to help in computing the local
             derivative of this layer. This layer is going to calculate the derivatives
             in terms of the local weights and biases and change them accordingly.
 
             :param derivatives: The derivatives from the front layers, has to match the output size.
-            :type derivatives: numpy.array
+            :type derivatives: numpy.ndarray
 
             :return: Returns the computed local derivative sum for each input node for use by the layers in the back.
-            :rtype: numpy.array
+            :rtype: numpy.ndarray
         """
         if self._outputs is None:
             raise RuntimeError("There hasn't been a forward pass for this dense layer!")
@@ -92,7 +92,7 @@ class Dense(Layer):
 
         # Since dy / dbias => 1, it's just going to be derivatives since multiplying with 1 does NOTHING!
         # This is used to move the bias in a certain direction.
-        biasGradients: np.array = derivatives
+        biasGradients: np.ndarray = derivatives
 
         # The propagation derivative is the sum of the weight derivative for each input.
         # The transpose function makes sure that each row corresponds to the weights going out from the corresponding input.
@@ -100,7 +100,7 @@ class Dense(Layer):
         # propagated backwards. Why it very much looks like the weightGradient, we are here instead calculating
         # dy / dinput, which is why we multiply by the weights instead of the input this time. This is because the input
         # to this system depends on variables calculated in the layers before this, hence why dy / dinput is calculated here.
-        propagationDerivatives: np.array = np.transpose(self._weights) @ derivatives
+        propagationDerivatives: np.ndarray = np.transpose(self._weights) @ derivatives
 
         # Change the weights. Since each row fo the weightGradients contain the gradients for the weights arriving at the output
         # we can just elementwise take a step in the opposite direction. Imagine if the gradient for a weight is positive, that means

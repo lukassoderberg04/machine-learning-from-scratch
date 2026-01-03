@@ -21,10 +21,10 @@ class Softmax(Layer):
         self._size: tuple[int, int] = (inputs, inputs) # The same size since it just applies a function on the input.
 
         # Initialized to None since no forward pass has happened.
-        self._inputs: np.array | None  = None
-        self._outputs: np.array | None = None
+        self._inputs: np.ndarray | None  = None
+        self._outputs: np.ndarray | None = None
 
-    def Forward(self, inputs: np.array) -> np.array:
+    def Forward(self, inputs: np.ndarray) -> np.ndarray:
         """
             The softmax has the function: e^(input - c) / sum(inputs, e^(input - c)), c = max(inputs). The exponential makes sure
             that the value, even if it's negative, is still positive. The (input - c) part is for making the values numerically stable.
@@ -35,10 +35,10 @@ class Softmax(Layer):
             Ex: 5 apples, 5 pears, how many percent apples. Well, you take 5 / (5 + 5) = 0.5.
 
             :param inputs: The logits to be converted into probabilities.
-            :type inputs: numpy.array
+            :type inputs: numpyp.ndarray
 
             :return: The probabilities for each class.
-            :rtype: numpy.array
+            :rtype: numpyp.ndarray
         """
         if len(inputs) != self.GetInputSize():
             raise RuntimeError("The inputs size didn't match the softmax's layer size!")
@@ -50,17 +50,17 @@ class Softmax(Layer):
         max: float = np.max(inputs)
 
         # Elementwise remove max from the original value, hence making it numerically stable.
-        shifted: np.array = inputs - max
+        shifted: np.ndarray = inputs - max
 
         # Elementwise take e^(input).
-        exponentialInputs: np.array = np.exp(shifted)
+        exponentialInputs: np.ndarray = np.exp(shifted)
 
         # Elementwise take the computed exponential and divide by the sum of all exponentials.
         self._outputs = exponentialInputs / np.sum(exponentialInputs)
 
         return self._outputs
     
-    def Backward(self, derivatives: np.array) -> np.array:
+    def Backward(self, derivatives: np.ndarray) -> np.ndarray:
         """
             First of, this layer isn't that effective since it has to calculate the jacobian matrix
             containing all the different gradients since changing input x0 changes all the outputs,
@@ -85,10 +85,10 @@ class Softmax(Layer):
             summing them all up.
 
             :param derivatives: The incoming derivatives from the layer in front.
-            :type derivatives: numpy.array
+            :type derivatives: numpyp.ndarray
 
             :return: Returns the propogation derivative for use in the layers in the back.
-            :rtype: numpy.array
+            :rtype: numpyp.ndarray
         """
         # Convert the outputs to a column vector.
         outputAsColumn: np.ndarray = self._outputs[:, None]
@@ -96,6 +96,6 @@ class Softmax(Layer):
         # Faster way to calculate the jacobian.
         jacobian: np.ndarray = np.diagflat(self._outputs) - outputAsColumn @ np.transpose(outputAsColumn)
 
-        toProp: np.array = jacobian @ derivatives
+        toProp: np.ndarray = jacobian @ derivatives
 
         return toProp
