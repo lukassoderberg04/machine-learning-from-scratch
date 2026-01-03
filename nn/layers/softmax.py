@@ -91,7 +91,7 @@ class Softmax(Layer):
             :rtype: numpy.array
         """
         # Convert the outputs to a column vector.
-        outputAsColumn: np.array = self._outputs[:, None]
+        outputAsColumn: np.ndarray = self._outputs[:, None]
 
         # Faster way to calculate the jacobian.
         jacobian: np.ndarray = np.diagflat(self._outputs) - outputAsColumn @ np.transpose(outputAsColumn)
