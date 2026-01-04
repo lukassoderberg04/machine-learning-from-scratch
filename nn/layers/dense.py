@@ -33,13 +33,17 @@ class Dense(Layer):
         self._outputs: np.ndarray | None = None
 
         # Initialize the bias, if bias are to be used!
-        self._usesBias: bool        = useBias
+        self._usesBias: bool          = useBias
         self._bias: np.ndarray | None = None
+        self._dB: np.ndarray | None   = None
         if useBias:
             self._bias = np.zeros(shape=output)
+            self._dB = np.zeros(shape=output) # Gradient buffer for bias.
 
         # Initialize the weights close to 0!
         self._weights: np.ndarray = np.random.normal(loc=0, scale=0.01, size=(output, input))
+
+        self._dW: np.ndarray = np.zeros(shape=(output, input)) # Gradient buffer for weights.
 
     def Forward(self, inputs: np.ndarray) -> np.ndarray:
         """
@@ -90,9 +94,14 @@ class Dense(Layer):
         # with dy / dweight to get the local gradient for each weight. This is used to move the weights in a certain direction.
         weightGradients: np.ndarray = np.outer(derivatives, self._inputs)
 
+        self._dW += weightGradients
+
         # Since dy / dbias => 1, it's just going to be derivatives since multiplying with 1 does NOTHING!
         # This is used to move the bias in a certain direction.
         biasGradients: np.ndarray = derivatives
+
+        if self._usesBias:
+            self._dB += biasGradients
 
         # The propagation derivative is the sum of the weight derivative for each input.
         # The transpose function makes sure that each row corresponds to the weights going out from the corresponding input.
@@ -107,10 +116,24 @@ class Dense(Layer):
         # that the cost function is increasing if we continue in that step, hence we want to go the other way around (positive gradient * negative
         # becomes negative, hence moving "backwards"). If the gradient is instead negative, that means that we should take a step forward since 
         # it's going down, hence why we multiply by -1 since -gradient * -1 becomes positive, meaning we continue forward in the step of descent.
-        self._weights -= weightGradients
+        # self._weights -= weightGradients
 
         # Same for bias as well, but only if we have activated it.
-        if (self._usesBias):
-            self._bias -= biasGradients
+        # if (self._usesBias):
+        #     self._bias -= biasGradients
 
         return propagationDerivatives
+    
+    def Update(self, batchSize: int) -> None:
+        """
+            Updates the layer's weights and biases.
+
+            :param batchSize: The size of the batch.
+            :type batchSize: int
+        """
+        self._weights -= self._dW / batchSize
+        self._dW.fill(0.0) # Reset!
+
+        if self._usesBias:
+            self._bias -= self._dB / batchSize
+            self._dB.fill(0.0) # Reset!

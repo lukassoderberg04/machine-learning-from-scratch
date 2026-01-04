@@ -36,6 +36,15 @@ class Layer():
         """
         raise NotImplementedError("Backward has not been implemented by the class yet!")
     
+    def Update(self, batchSize: int) -> None:
+        """
+            Updates the layer's parameters depending on if it's implemented or not.
+
+            :param batchSize: The size of the batch.
+            :type batchSize: int
+        """
+        pass # Just pass if it wasn't implemented.
+    
     def GetSize(self) -> tuple[int, int]:
         if self._size is None:
             raise RuntimeError("Size has not been initialized by a layer!")

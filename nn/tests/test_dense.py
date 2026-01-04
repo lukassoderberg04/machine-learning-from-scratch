@@ -27,6 +27,7 @@ class TestDenseComputation(unittest.TestCase):
         # Act:
         outputs: np.array     = layer.Forward(inputs)
         toPropagate: np.array = layer.Backward(derivatives)
+        layer.Update(1)
 
         # Assert:
         self.assertEqual(len(toPropagate), 2) # Since the layer's input count is 2.

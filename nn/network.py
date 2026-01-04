@@ -40,9 +40,10 @@ class Network():
 
         while True:
             batch: list[MnistDataloader.DataPair] = dataloader.ReadOneBatch()
-            batches += 1
 
             if len(batch) <= 0: return avgCost / batches if batches > 0 else 0.0 # No more pairs to read.
+
+            batches += 1
 
             cost: float = self._trainOneBatch(batch)
 
@@ -71,6 +72,9 @@ class Network():
             avgCost += cost
 
             self._backward(derivatives)
+
+        for layer in self._layers:
+            layer.Update(len(batch))
 
         return avgCost / len(batch)
 
