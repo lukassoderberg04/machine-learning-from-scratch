@@ -25,3 +25,11 @@ This is a good way to make sure that some of the projects functionality works as
 * **/nn/**: Directory containing classes and other function for creating and defining a neural network.
 
 * **nn/tests/**: Directory for tests regarding neural network.
+
+* **nn/layers/**: Directory of all layers that could be used to setup a network.
+
+* **nn/networks/**: Directory of base objets for storing the layers and executing the training and evaluation.
+
+* **nn/costs/**: Directory of the cost layers responsible for computing the cost function.
+
+* **gui/**: Directory containing code for the graphical interface.
