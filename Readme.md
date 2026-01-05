@@ -15,6 +15,14 @@ python -m unittest
 
 This is a good way to make sure that some of the projects functionality works as intended.
 
+### Running the project
+To test the project, run python main.py, but first make sure to change the settings in the file! Especially the mode of the program! Ex:
+
+```python
+# General settings:
+mode: Mode = Mode.GUI
+```
+
 ## Project structure
 * **/mnist/**: Directory containing helper classes and utility functions for loading the mnist dataset, used in training and validating the different models.
 
