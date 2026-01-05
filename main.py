@@ -11,11 +11,13 @@ from nn.layers.softmax import Softmax
 from nn.memory import Memory
 from nn.network import Network
 from nn.networks.sequential import Sequential
+from gui.mnist_gui import MnistGui
 
 class Mode(Enum):
     TRAIN = 0
     GUI   = 1
     TRAIN_THEN_GUI = 2
+    MNIST_GUI = 3
 
 mainFilePath: Path = Path(__file__).resolve().parent
 memory: Memory     = Memory()
@@ -25,7 +27,7 @@ INPUT_SIZE: int  = 28 * 28
 OUTPUT_SIZE: int = 10
 
 # General settings:
-mode: Mode = Mode.TRAIN_THEN_GUI
+mode: Mode = Mode.GUI
 
 # Training settings:
 layers: list[Layer]                 = [
@@ -73,7 +75,7 @@ def Train() -> Network:
     return trainingNetwork
 
 # GUI settings:
-guiNetworkLoadPath: Path = mainFilePath / "first_run.pkl"
+guiNetworkLoadPath: Path = mainFilePath / "95percent.pkl"
 
 def Gui(network: Network | None = None):
     """
@@ -88,6 +90,21 @@ def Gui(network: Network | None = None):
 
     app.Run()
 
+def MnistGuiApp(network: Network | None = None):
+    """
+        Runs the application and the GUI.
+    """
+    dataloader: MnistDataloader = trainingDataloader
+
+    if network is None:
+        guiNetwork: Network = memory.LoadNetwork(guiNetworkLoadPath)
+        app: MnistGui       = MnistGui(guiNetwork, dataloader)
+    else:
+        guiNetwork: Network = network
+        app: MnistGui       = MnistGui(guiNetwork, dataloader)
+
+    app.Run()
+
 def Main():
     """
         The Main entrypoint of the python program.
@@ -99,6 +116,8 @@ def Main():
     elif mode == Mode.TRAIN_THEN_GUI:
         network: Network = Train()
         Gui(network)
+    elif mode == Mode.MNIST_GUI:
+        MnistGuiApp()
 
     return
 
