@@ -4,6 +4,7 @@ from io import TextIOWrapper
 from pathlib import Path
 from mnist.mnist_image import MnistImage
 import csv
+import random
 
 class MnistDataloader():
     """
@@ -14,13 +15,16 @@ class MnistDataloader():
     Label    = int
     DataPair = tuple["MnistDataloader.Label", MnistImage]
 
-    def __init__(self, pathToDataset: str, batchSize: int = 10) -> None:
+    def __init__(self, pathToDataset: str, batchSize: int = 10, shuffle: bool = False) -> None:
         """
             :param pathToDataset: The path to the dataset (nmist).
             :type pathToDataset: str
 
             :param batchSize: The amount of images to read each read.
             :type batchSize: int
+
+            :param shuffle: To shuffle the batch or not.
+            :type shuffle: bool
 
             :raises TypeError: If the batchSize is negative or zero.
             :raises FileNotFoundError: If the pathToDataset does not exist.
@@ -41,8 +45,15 @@ class MnistDataloader():
             self._batchSize: int = batchSize
         else:
             raise TypeError("Batch size can't be lower than 1!")
+        
+        self._shuffle: bool                = shuffle
+        self._rows: list[list[str]] | None = None
+        self._index: int                   = 0  # Track where we are.
 
-        return
+        if shuffle:
+            # Load all rows into memory for shuffling.
+            self._rows = list(self._csvFile)
+            random.shuffle(self._rows)
     
     def ReadOneBatch(self) -> list["MnistDataloader.DataPair"]:
         """
@@ -99,6 +110,15 @@ class MnistDataloader():
             :rtype: list[str] | None
         """
 
+        if self._shuffle:
+            if self._rows is None or self._index >= len(self._rows):
+                return None
+            
+            line         = self._rows[self._index]
+            self._index += 1
+
+            return line
+
         try:
             return next(self._csvFile)
         except StopIteration:
@@ -108,8 +128,13 @@ class MnistDataloader():
         """
             Resets the dataloader so reading starts from the beginning again.
         """
-        self._file.seek(0)
-        self._csvFile = csv.reader(self._file)
+        if not self._shuffle:
+            self._file.seek(0)
+            self._csvFile = csv.reader(self._file)
+            return
+        
+        random.shuffle(self._rows)
+        self._index = 0
         
     def __del__(self):
         if hasattr(self, "_file") and self._file:
