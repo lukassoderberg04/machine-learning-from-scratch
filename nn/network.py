@@ -126,6 +126,41 @@ class Network():
         outputs: np.ndarray = self._forward(inputs)
 
         return outputs
+    
+    def Evaluate(self, dataloader: MnistDataloader) -> float:
+        """
+            Evaluates the model and return what accuracy it has, from 0 to 1.
+
+            :param dataloader: The one responsible for loading the evaluation data.
+            :type dataloader: mnist.MnistDataloader
+
+            :return: The accuracy of this model.
+            :rtype: float
+        """
+
+        if self._layers is None or len(self._layers) <= 0:
+            raise RuntimeError("The layers are either undefined or there aren't any layers!")
+
+        correct: int = 0
+        total: int   = 0
+
+        while True:
+            batch: list[MnistDataloader.DataPair] = dataloader.ReadOneBatch()
+
+            if len(batch) <= 0:
+                break  # no more data to read.
+
+            for (label, image) in batch:
+                output: np.ndarray = self.Compute(image)
+
+                predicted: int = int(np.argmax(output))
+
+                if predicted == label:
+                    correct += 1
+
+                total += 1
+
+        return correct / total if total > 0 else 0.0
 
     def CheckLayerConnection(self) -> None:
         """

@@ -1,4 +1,6 @@
 from __future__ import annotations
+from pathlib import Path
+import pickle
 
 from nn.network import Network
 
@@ -11,27 +13,27 @@ class Memory():
         pass
 
     def SaveNetwork(self, network: Network, path: str) -> None:
-        pass
+        if not isinstance(network, Network):
+            raise TypeError("SaveNetwork expects a Network instance!")
+
+        file_path = Path(path).resolve()
+
+        # Ensure directory exists!
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(file_path, "wb") as f:
+            pickle.dump(network, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     def LoadNetwork(self, path: str) -> Network:
-        pass
+        file_path = Path(path).resolve()
 
-""" SAVING:
-    import pickle
+        if not file_path.exists():
+            raise FileNotFoundError(f"Network file does not exist: {file_path}!")
 
-    # Suppose `network` is your Network instance
-    network = Network()
-    network._learningRate = 0.01
-    # ... setup layers, cost, etc.
+        with open(file_path, "rb") as f:
+            network = pickle.load(f)
 
-    # Save to a file
-    with open("network.pkl", "wb") as f:
-        pickle.dump(network, f)
-"""
+        if not isinstance(network, Network):
+            raise TypeError("Loaded object is not a Network instance!")
 
-""" LOADING:
-    import pickle
-
-    with open("network.pkl", "rb") as f:
-        loaded_network = pickle.load(f)
-"""
+        return network

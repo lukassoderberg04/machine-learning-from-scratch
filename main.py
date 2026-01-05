@@ -13,14 +13,14 @@ class Mode(Enum):
     TRAIN = 0
     GUI   = 1
 
-currentFilePath: Path = Path(__file__).resolve()
-memory: Memory        = Memory()
+mainFilePath: Path = Path(__file__).resolve()
+memory: Memory     = Memory()
 
 # The sizes of the networks input / output.
 INPUT_SIZE: int  = 28 * 28
 OUTPUT_SIZE: int = 10
 
-# Set the mode of the main function here!
+# General settings:
 mode: Mode = Mode.TRAIN
 
 # Training settings:
@@ -28,16 +28,12 @@ layers: list[Layer]                 = []
 costFunction: Cost                  = Mse(OUTPUT_SIZE)
 learningRate: float                 = 0.01
 trainingNetwork: Network            = Sequential(layers, costFunction, learningRate)
-trainingDataSetPath: Path           = currentFilePath / "mnist" / "data" / "mnist_test.csv"
+trainingDataSetPath: Path           = mainFilePath / "mnist" / "data" / "mnist_test.csv"
 batchSize: int                      = 10
 trainingDataloader: MnistDataloader = MnistDataloader(trainingDataSetPath, batchSize)
 epochsToTrain: int                  = 10
-trainingNetworkSavePath: Path       = currentFilePath
-
-# GUI settings:
-guiNetworkLoadPath: Path = currentFilePath / "test_network"
-guiNetwork: Network      = memory.LoadNetwork(guiNetworkLoadPath)
-app: App                 = App(guiNetwork)
+trainingNetworkSaveName: str        = "test_network"
+trainingNetworkSavePath: Path       = mainFilePath
 
 def Train():
     """
@@ -48,7 +44,19 @@ def Train():
         print(f"Epoch {epoch} cost: {epochCost}")
         trainingDataloader.Reset()
 
-    memory.SaveNetwork(trainingNetwork, trainingNetworkSavePath)
+    # Ask the user if you should save or not.
+    answer = input("Save trained network? [y/n]: ").strip().lower()
+
+    if answer in ("y", "yes"):
+        memory.SaveNetwork(trainingNetwork, trainingNetworkSavePath)
+        print("Network saved!")
+    else:
+        print("Network not saved!")
+
+# GUI settings:
+guiNetworkLoadPath: Path = mainFilePath / "test_network.pkl"
+guiNetwork: Network      = memory.LoadNetwork(guiNetworkLoadPath)
+app: App                 = App(guiNetwork)
 
 def Gui():
     """
