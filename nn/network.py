@@ -62,7 +62,7 @@ class Network():
         avgCost: float = 0.0
 
         for (classification, image) in batch:
-            output: np.ndarray = self._forward(image)
+            output: np.ndarray = self._forward(image.GetNormalizedPixels())
 
             expected: np.ndarray     = np.zeros(shape=10)
             expected[classification] = 1.0 # Ex: [0.0, 0.0, 0.0, 1.0, 0.0, 0.0].
@@ -151,7 +151,7 @@ class Network():
                 break  # no more data to read.
 
             for (label, image) in batch:
-                output: np.ndarray = self.Compute(image)
+                output: np.ndarray = self.Compute(image.GetNormalizedPixels())
 
                 predicted: int = int(np.argmax(output))
 
