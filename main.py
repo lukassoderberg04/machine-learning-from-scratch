@@ -15,6 +15,7 @@ from nn.networks.sequential import Sequential
 class Mode(Enum):
     TRAIN = 0
     GUI   = 1
+    TRAIN_THEN_GUI = 2
 
 mainFilePath: Path = Path(__file__).resolve().parent
 memory: Memory     = Memory()
@@ -24,7 +25,7 @@ INPUT_SIZE: int  = 28 * 28
 OUTPUT_SIZE: int = 10
 
 # General settings:
-mode: Mode = Mode.TRAIN
+mode: Mode = Mode.TRAIN_THEN_GUI
 
 # Training settings:
 layers: list[Layer]                 = [
@@ -41,12 +42,12 @@ trainingDataSetPath: Path             = mainFilePath / "mnist" / "data" / "mnist
 batchSize: int                        = 10
 trainingDataloader: MnistDataloader   = MnistDataloader(trainingDataSetPath, batchSize)
 epochsToTrain: int                    = 10
-trainingNetworkSaveName: str          = "test_network"
-trainingNetworkSavePath: Path         = mainFilePath
+trainingNetworkSaveName: str          = "first_run.pkl"
+trainingNetworkSavePath: Path         = mainFilePath / trainingNetworkSaveName
 evaluationDataSetPath: Path           = mainFilePath / "mnist" / "data" / "mnist_test.csv"
 evaluationDataloader: MnistDataloader = MnistDataloader(evaluationDataSetPath, batchSize)
 
-def Train():
+def Train() -> Network:
     """
         Function for handling training.
     """
@@ -69,15 +70,21 @@ def Train():
     else:
         print("Network not saved!")
 
-# GUI settings:
-guiNetworkLoadPath: Path = mainFilePath / "test_network.pkl"
+    return trainingNetwork
 
-def Gui():
+# GUI settings:
+guiNetworkLoadPath: Path = mainFilePath / "first_run.pkl"
+
+def Gui(network: Network | None = None):
     """
         Runs the application and the GUI.
     """
-    guiNetwork: Network      = memory.LoadNetwork(guiNetworkLoadPath)
-    app: App                 = App(guiNetwork)
+    if network is None:
+        guiNetwork: Network      = memory.LoadNetwork(guiNetworkLoadPath)
+        app: App                 = App(guiNetwork)
+    else:
+        guiNetwork: Network = network
+        app: App            = App(guiNetwork)
 
     app.Run()
 
@@ -89,6 +96,10 @@ def Main():
         Train()
     elif mode == Mode.GUI:
         Gui()
+    elif mode == Mode.TRAIN_THEN_GUI:
+        network: Network = Train()
+        Gui(network)
+
     return
 
 Main()
