@@ -104,6 +104,13 @@ class MnistDataloader():
         except StopIteration:
             return None
         
+    def Reset(self) -> None:
+        """
+            Resets the dataloader so reading starts from the beginning again.
+        """
+        self._file.seek(0)
+        self._csvFile = csv.reader(self._file)
+        
     def __del__(self):
         if hasattr(self, "_file") and self._file:
             self._file.close()
