@@ -9,7 +9,7 @@ class App():
         The GUI application that is used to draw digits yourself
         and see what the specified model (with the specified weights)
         predicts. Most of this is generated using AI since it wasn't
-        very interesting in learning another UI framework since the main
+        very interesting learning another UI framework since the main
         objective with this project was to understand machine learning.
     """
 
