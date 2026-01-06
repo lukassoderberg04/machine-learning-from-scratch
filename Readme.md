@@ -4,7 +4,7 @@ A personal project made to learn more about how machine learning is implemented 
 ## Running the project
 
 ### Prerequisites
-This project depends on the python library **Numpy**.
+The python version used for this project is 3.13.9 and is heavily dependent on the python library **Numpy**.
 
 ### Executing tests
 By using pythons built in testing module, you can run all tests from the root directory of this project. Do this by typing this into the command line with the working directory set to the project root:
@@ -21,6 +21,12 @@ To test the project, run python main.py, but first make sure to change the setti
 ```python
 # General settings:
 mode: Mode = Mode.GUI
+```
+
+To run the program from working directory as the project root:
+
+```bash
+python main.py
 ```
 
 ## Project structure
