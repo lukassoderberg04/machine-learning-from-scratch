@@ -8,7 +8,9 @@ class App():
     """
         The GUI application that is used to draw digits yourself
         and see what the specified model (with the specified weights)
-        predicts.
+        predicts. Most of this is generated using AI since it wasn't
+        very interesting in learning another UI framework since the main
+        objective with this project was to understand machine learning.
     """
 
     CELL_SIZE: int = 8  # Size in pixels of the cells.
@@ -26,7 +28,7 @@ class App():
         self._predictionVar: tk.StringVar | None = None
 
         # Grid state:
-        self._grid: list[list[int]] = [[0 for _ in range(self.GRID_SIZE)] for _ in range(self.GRID_SIZE)]
+        self._grid: list[list[float]] = [[0.0 for _ in range(self.GRID_SIZE)] for _ in range(self.GRID_SIZE)]
 
     def _drawCell(self, event: tk.Event) -> None:
         """
@@ -37,21 +39,60 @@ class App():
         """
         assert self._canvas is not None
 
-        x: int = event.x // self.CELL_SIZE
-        y: int = event.y // self.CELL_SIZE
+        x = event.x // self.CELL_SIZE
+        y = event.y // self.CELL_SIZE
 
         if 0 <= x < self.GRID_SIZE and 0 <= y < self.GRID_SIZE:
-            if self._grid[y][x] == 0:
-                self._grid[y][x] = 1
-                self._canvas.create_rectangle(
-                    x * self.CELL_SIZE,
-                    y * self.CELL_SIZE,
-                    (x + 1) * self.CELL_SIZE,
-                    (y + 1) * self.CELL_SIZE,
-                    fill="black",
-                    outline=""
-                )
-                self._predict()
+            # Accumulate instead of overwrite (optional but recommended)
+            self._grid[y][x] = 1.0
+
+            self._redrawGrid()
+            self._predict()
+
+    def _smoothGrid(self, event: tk.Event) -> None:
+        kernel = np.array([
+            [0, 1, 0],
+            [1, 4, 1],
+            [0, 1, 0]
+        ], dtype=np.float64) / 8.0
+
+        grid = np.array(self._grid, dtype=np.float64)
+        smoothed = np.zeros_like(grid)
+
+        for y in range(1, self.GRID_SIZE - 1):
+            for x in range(1, self.GRID_SIZE - 1):
+                region = grid[y-1:y+2, x-1:x+2]
+                smoothed[y, x] = np.sum(region * kernel)
+
+        # Clamp values to [0.0, 1.0]
+        smoothed = np.clip(smoothed, 0.0, 1.0)
+
+        self._grid = smoothed.tolist()
+
+        self._redrawGrid()
+        self._predict()
+
+    def _redrawGrid(self) -> None:
+        assert self._canvas is not None
+
+        self._canvas.delete("all")
+        self._drawGridLines()
+
+        for y in range(self.GRID_SIZE):
+            for x in range(self.GRID_SIZE):
+                value = self._grid[y][x]
+                if value > 0.0:
+                    shade = int(255 * (1.0 - value))
+                    color = f"#{shade:02x}{shade:02x}{shade:02x}"
+
+                    self._canvas.create_rectangle(
+                        x * self.CELL_SIZE,
+                        y * self.CELL_SIZE,
+                        (x + 1) * self.CELL_SIZE,
+                        (y + 1) * self.CELL_SIZE,
+                        fill=color,
+                        outline=""
+                    )
 
     def _clearGrid(self, event: tk.Event) -> None:
         """
@@ -60,17 +101,14 @@ class App():
             :param event: The mouse event.
             :type event: tk.Event
         """
-        assert self._canvas is not None
         assert self._predictionVar is not None
-
-        self._canvas.delete("all")
 
         for y in range(self.GRID_SIZE):
             for x in range(self.GRID_SIZE):
-                self._grid[y][x] = 0
+                self._grid[y][x] = 0.0
 
         self._predictionVar.set("Prediction: ?")
-        self._drawGridLines()
+        self._redrawGrid()
 
     def _drawGridLines(self) -> None:
         """
@@ -78,17 +116,23 @@ class App():
         """
         assert self._canvas is not None
 
-        for i in range(self.GRID_SIZE + 1):
-            self._canvas.create_line(
-                0, i * self.CELL_SIZE,
-                self.GRID_SIZE * self.CELL_SIZE, i * self.CELL_SIZE,
-                fill="lightgray"
-            )
-            self._canvas.create_line(
-                i * self.CELL_SIZE, 0,
-                i * self.CELL_SIZE, self.GRID_SIZE * self.CELL_SIZE,
-                fill="lightgray"
-            )
+        self._canvas.delete("all")
+
+        for y in range(self.GRID_SIZE):
+            for x in range(self.GRID_SIZE):
+                value = self._grid[y][x]
+                if value > 0.0:
+                    shade = int(255 * (1.0 - value))
+                    color = f"#{shade:02x}{shade:02x}{shade:02x}"
+
+                    self._canvas.create_rectangle(
+                        x * self.CELL_SIZE,
+                        y * self.CELL_SIZE,
+                        (x + 1) * self.CELL_SIZE,
+                        (y + 1) * self.CELL_SIZE,
+                        fill=color,
+                        outline=""
+                    )
 
     def _predict(self) -> None:
         """
@@ -151,5 +195,6 @@ class App():
         self._canvas.bind("<Button-1>", self._drawCell)
         self._canvas.bind("<B1-Motion>", self._drawCell)
         self._canvas.bind("<Button-3>", self._clearGrid)
+        self._canvas.bind("<ButtonRelease-1>", self._smoothGrid)
 
         self._root.mainloop()
